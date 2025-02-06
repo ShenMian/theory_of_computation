@@ -1,4 +1,4 @@
-# 计算理论 (Theory of Computation)
+# 计算理论导论笔记
 
 本文为计算理论导论 ([MIT18.404J], [MIT OCW]) 的课程笔记.
 
