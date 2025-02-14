@@ -1,12 +1,11 @@
-#import "@preview/ilm:1.2.1": *
+#import "@preview/ilm:1.4.0": *
 
-#import "@preview/codly:1.0.0": *
+#import "@preview/codly:1.2.0": *
 #show: codly-init.with()
 
-#import "@preview/mannot:0.1.0": *
-#show: mannot-init
+#import "@preview/mannot:0.2.1": *
 
-#import "@preview/fletcher:0.5.2" as fletcher: node
+#import "@preview/fletcher:0.5.4" as fletcher: node
 #let diagram = fletcher.diagram.with(node-stroke: .1em)
 #let trans = fletcher.edge.with(marks: "-|>")
 #let state = fletcher.node.with(shape: circle)
