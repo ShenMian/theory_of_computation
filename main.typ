@@ -1,9 +1,10 @@
 #import "@preview/ilm:1.4.0": *
+#import "@preview/mannot:0.2.1": *
 
 #import "@preview/codly:1.2.0": *
-#show: codly-init.with()
-
-#import "@preview/mannot:0.2.1": *
+#import "@preview/codly-languages:0.1.1": *
+#show: codly-init
+#codly(languages: codly-languages)
 
 #import "@preview/fletcher:0.5.4" as fletcher: node
 #let diagram = fletcher.diagram.with(node-stroke: .1em)
