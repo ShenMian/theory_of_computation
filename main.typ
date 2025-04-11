@@ -78,13 +78,13 @@
     accept_state((1, 0), name: <q2>, [$q_2$]),
     accept_state((2, 0), name: <q3>, [$q_3$]),
 
-    trans(<q1>, <q1>, [0], bend: 130deg),
-    trans(<q1>, <q2>, [1], bend: 30deg),
+    trans(<q1>, <q1>, [$0$], bend: 130deg),
+    trans(<q1>, <q2>, [$1$], bend: 30deg),
 
-    trans(<q2>, <q1>, [0], bend: 30deg),
-    trans(<q2>, <q3>, [1]),
+    trans(<q2>, <q1>, [$0$], bend: 30deg),
+    trans(<q2>, <q3>, [$1$]),
 
-    trans(<q3>, <q3>, [0,1], bend: 130deg),
+    trans(<q3>, <q3>, [$0,1$], bend: 130deg),
   )
 )
 
@@ -348,11 +348,11 @@ $
     state((2, 0), name: <q3>, [$q_3$]),
     accept_state((3, 0), name: <q4>, [$q_4$], extrude: (-2.5, 0)),
 
-    trans(<q1>, <q1>, [a], bend: 130deg),
-    trans(<q1>, <q2>, [a], bend: 30deg),
+    trans(<q1>, <q1>, [$a$], bend: 130deg),
+    trans(<q1>, <q2>, [$a$], bend: 30deg),
 
-    trans(<q2>, <q1>, [b], bend: 30deg),
-    trans(<q2>, <q3>, [b]),
+    trans(<q2>, <q1>, [$b$], bend: 30deg),
+    trans(<q2>, <q3>, [$b$]),
 
     trans(<q3>, <q4>, [$a$]),
   )
@@ -384,13 +384,13 @@ $
     state((2, 0), name: <q3>, [$q_3$]),
     accept_state((3, 0), name: <q4>, [$q_4$], extrude: (-2.5, 0)),
 
-    trans(<q1>, <q1>, [a], bend: 130deg),
-    trans(<q1>, <q2>, [a], bend: 30deg),
+    trans(<q1>, <q1>, [$a$], bend: 130deg),
+    trans(<q1>, <q2>, [$a$], bend: 30deg),
 
-    trans(<q2>, <q1>, [b], bend: 30deg),
-    trans(<q2>, <q3>, [b]),
+    trans(<q2>, <q1>, [$b$], bend: 30deg),
+    trans(<q2>, <q3>, [$b$]),
 
-    trans(<q3>, <q4>, [$a, epsilon$]),
+    trans(<q3>, <q4>, [$a,epsilon$]),
   )
 )
 
