@@ -321,10 +321,10 @@ $ delta((q, r), a) = (delta_1(q, a), delta_2(r, a)) $
 只要 $q in Q_1$ 或 $r in Q_2$, 该状态即为 $M$ 的接受状态:
 
 $
-F = mark((F_1 times Q_2), tag: #<f1>) union mark((F_2 times Q_1), tag: #<f2>, color: #blue)
+F = mark((F_1 times Q_2), tag: #<f1>) union mark((Q_1 times F_2), tag: #<f2>, color: #blue)
 
 #annot(<f1>, pos: top)[$M_1$ 的接受状态与 $M_2$ 的任意状态]
-#annot(<f2>, pos: bottom)[$M_2$ 的接受状态与 $M_1$ 的任意状态]
+#annot(<f2>, pos: bottom)[$M_1$ 的任意状态与 $M_2$ 的接受状态]
 $
 
 其中*定理 2* 和*定理 3*无法通过简单的构造 DFA 来证明, @nfa 将介绍非确定有限自动机, 该自动机与 DFA 等价. @nfa-to-dfa 将利用非确定有限自动机简化上述*定理 1* 的证明, 并证明另外两种正则操作的闭合属性.
