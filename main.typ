@@ -29,7 +29,7 @@
   bibliography: bibliography("refs.bib"),
   figure-index: (enabled: true, title: "图片索引"),
   table-index: (enabled: false, title: "表格索引"),
-  listing-index: (enabled: true, title: "代码索引")
+  listing-index: (enabled: true, title: "代码索引"),
 )
 
 #set text(font: ("New Computer Modern", "Source Han Serif SC"))
@@ -62,7 +62,7 @@
 
 确定有限自动机 (以下简称 DFA) 是一种自动机, 其中 "确定" 和 "有限" 是对该自动机的限制, 含义如下:
 - *确定*: 此处的 "确定" 是相对于*非确定*而言的. 后续将在 @nfa 介绍非确定有限自动机, 届时将说明确定和非确定的含义.
-- *有限*: DFA 也被称为确定*有限状态*自动机, 顾名思义, 其中的 "有限" 指*状态的数量有限*.
+- *有限*: DFA 也被称为确定*有限状态*自动机, 顾名思义, 其中的 "有限" 指的是*状态的数量有限*.
 
 下图是 DFA $M_1$ 的状态图:
 
@@ -85,7 +85,7 @@
     trans(<q2>, <q3>, [$1$]),
 
     trans(<q3>, <q3>, [$0,1$], bend: 130deg),
-  )
+  ),
 )
 
 - *输入*: *有限*的字符串.
@@ -102,7 +102,7 @@
 $M_1$ 的语言 $A$ 可以表示为:
 
 $
-A &= L(M_1) \
+  A &= L(M_1) \
   &= {w | w "包含子串 \"11\""}
 $
 
@@ -119,13 +119,13 @@ $M_1$ 的符号化表示如下:
 
 $
   M_1 &= (Q, Sigma, delta, q_0, F) \
-    Q &= {q_1, q_2, q_3} \
-Sigma &= {0, 1} \
+  Q &= {q_1, q_2, q_3} \
+  Sigma &= {0, 1} \
   q_0 &= q_1 \
-    F &= {q_3} \
-delta &=
+  F &= {q_3} \
+  delta &=
   mat(
-      ,    0,   1;
+    , 0, 1;
     q_1, q_1, q_2;
     q_2, q_1, q_3;
     q_3, q_3, q_3;
@@ -167,90 +167,90 @@ $
 DFA 的 Rust 代码实现为:
 
 #figure(caption: [确定有限自动机.])[
-```rust
-use std::marker::PhantomData;
+  ```rust
+  use std::marker::PhantomData;
 
-struct Dfa<S, A, D>
-where
-    S: Copy + PartialEq,
-    D: Fn(S, &A) -> S,
-{
-    start_state: S,
-    accept_states: Vec<S>,
-    transition: D,
-    _phantom_data: PhantomData<A>,
-}
+  struct Dfa<S, A, D>
+  where
+      S: Copy + PartialEq,
+      D: Fn(S, &A) -> S,
+  {
+      start_state: S,
+      accept_states: Vec<S>,
+      transition: D,
+      _phantom_data: PhantomData<A>,
+  }
 
-impl<S, A, D> Dfa<S, A, D>
-where
-    S: Copy + PartialEq,
-    D: Fn(S, &A) -> S,
-{
-    fn new(start_state: S, accept_states: Vec<S>, transition: D) -> Self {
-        Self {
-            start_state,
-            accept_states,
-            transition,
-            _phantom_data: PhantomData,
-        }
-    }
+  impl<S, A, D> Dfa<S, A, D>
+  where
+      S: Copy + PartialEq,
+      D: Fn(S, &A) -> S,
+  {
+      fn new(start_state: S, accept_states: Vec<S>, transition: D) -> Self {
+          Self {
+              start_state,
+              accept_states,
+              transition,
+              _phantom_data: PhantomData,
+          }
+      }
 
-    fn recognize(&self, string: &[A]) -> bool {
-        let mut state = self.start_state;
-        for input in string {
-            state = (self.transition)(state, input);
-        }
-        self.accept_states.contains(&state)
-    }
-}
-```
+      fn recognize(&self, string: &[A]) -> bool {
+          let mut state = self.start_state;
+          for input in string {
+              state = (self.transition)(state, input);
+          }
+          self.accept_states.contains(&state)
+      }
+  }
+  ```
 ]
 
 #figure(caption: [确定有限自动机 $M_1$.])[
-```rust
-#[derive(Clone, Copy, PartialEq)]
-enum State {
-    Q1,
-    Q2,
-    Q3,
-}
+  ```rust
+  #[derive(Clone, Copy, PartialEq)]
+  enum State {
+      Q1,
+      Q2,
+      Q3,
+  }
 
-enum Alphabet {
-    Zero,
-    One,
-}
+  enum Alphabet {
+      Zero,
+      One,
+  }
 
-fn main() {
-    let m1 = Dfa::new(
-        State::Q1,
-        vec![State::Q3],
-        |state, symbol| -> State {
-            match (state, symbol) {
-                (State::Q1, Alphabet::Zero) => State::Q1,
-                (State::Q1, Alphabet::One) => State::Q2,
-                (State::Q2, Alphabet::Zero) => State::Q1,
-                (State::Q2, Alphabet::One) => State::Q3,
-                (State::Q3, _) => State::Q3,
-            }
-        }
-    );
+  fn main() {
+      let m1 = Dfa::new(
+          State::Q1,
+          vec![State::Q3],
+          |state, symbol| -> State {
+              match (state, symbol) {
+                  (State::Q1, Alphabet::Zero) => State::Q1,
+                  (State::Q1, Alphabet::One) => State::Q2,
+                  (State::Q2, Alphabet::Zero) => State::Q1,
+                  (State::Q2, Alphabet::One) => State::Q3,
+                  (State::Q3, _) => State::Q3,
+              }
+          }
+      );
 
-    assert!(m1.recognize(&[
-        Alphabet::Zero,
-        Alphabet::One,
-        Alphabet::One,
-        Alphabet::Zero,
-        Alphabet::One
-    ]));
-    assert!(!m1.recognize(&[
-        Alphabet::Zero,
-        Alphabet::Zero,
-        Alphabet::One,
-        Alphabet::Zero,
-        Alphabet::One
-    ]));
-}
-```
+      assert!(m1.recognize(&[
+          Alphabet::Zero,
+          Alphabet::One,
+          Alphabet::One,
+          Alphabet::Zero,
+          Alphabet::One
+      ]));
+      assert!(!m1.recognize(&[
+          Alphabet::Zero,
+          Alphabet::Zero,
+          Alphabet::One,
+          Alphabet::Zero,
+          Alphabet::One
+      ]));
+  }
+  ```
 ]
 
 == 正则表达式 (Regular expressions)
@@ -308,8 +308,8 @@ fn main() {
 这意味着自动机 $M$ 能在单个状态里同时表示 $M_1$ 和 $M_2$ 的状态, 如下所示:
 
 $
-Q = Q_1 times Q_2 = { (q_1, q_2) | q_1 in Q_1 and q_2 in Q_2 } \
-q_0 = (q_1, q_2)
+  Q = Q_1 times Q_2 = { (q_1, q_2) | q_1 in Q_1 and q_2 in Q_2 } \
+  q_0 = (q_1, q_2)
 $
 
 这样 $M$ 就可以并行地跟踪 $M_1$ 和 $M_2$ 的状态.
@@ -321,10 +321,9 @@ $ delta((q, r), a) = (delta_1(q, a), delta_2(r, a)) $
 只要 $q in Q_1$ 或 $r in Q_2$, 该状态即为 $M$ 的接受状态:
 
 $
-F = mark((F_1 times Q_2), tag: #<f1>) union mark((Q_1 times F_2), tag: #<f2>, color: #blue)
-
-#annot(<f1>, pos: top)[$M_1$ 的接受状态与 $M_2$ 的任意状态]
-#annot(<f2>, pos: bottom)[$M_1$ 的任意状态与 $M_2$ 的接受状态]
+  F = mark((F_1 times Q_2), tag: #<f1>) union mark((Q_1 times F_2), tag: #<f2>, color: #blue)
+  #annot(<f1>, pos: top)[$M_1$ 的接受状态与 $M_2$ 的任意状态]
+  #annot(<f2>, pos: bottom)[$M_1$ 的任意状态与 $M_2$ 的接受状态]
 $
 
 其中*定理 2* 和*定理 3*无法通过简单的构造 DFA 来证明, @nfa 将介绍非确定有限自动机, 该自动机与 DFA 等价. @nfa-to-dfa 将利用非确定有限自动机简化上述*定理 1* 的证明, 并证明另外两种正则操作的闭合属性.
@@ -355,7 +354,7 @@ $
     trans(<q2>, <q3>, [$b$]),
 
     trans(<q3>, <q4>, [$a$]),
-  )
+  ),
 )
 
 对于 DFA 来说, 转移由源状态和输入符号确定, 并且唯一. \
@@ -391,7 +390,7 @@ $
     trans(<q2>, <q3>, [$b$]),
 
     trans(<q3>, <q4>, [$a,epsilon$]),
-  )
+  ),
 )
 
 以 $N_2$ 为例, 当输入的字符串为:
@@ -406,9 +405,8 @@ $
 NFA 的新特性*均与转移有关*, 因此它与 DFA 的五元组定义相似, 唯一的区别在于转移函数:
 
 $
-delta: Q times Sigma -> mark(cal(P)(Q), tag: #<powerset>) = { R | R subset.eq Q }
-
-#annot(<powerset>, pos: bottom)[$Q$ 的幂集]
+  delta: Q times Sigma -> mark(cal(P)(Q), tag: #<powerset>) = { R | R subset.eq Q }
+  #annot(<powerset>, pos: bottom)[$Q$ 的幂集]
 $
 
 #figure(caption: [$N_1$ 的状态转移表])[
@@ -427,9 +425,8 @@ $
 eNFA 的定义与 NFA 类似, 但转移函数允许 $epsilon$-转移:
 
 $
-delta: Q times mark(Sigma_epsilon, tag: #<se>) -> cal(P)(Q) = { R | R subset.eq Q }
-
-#annot(<se>, pos: bottom)[${Sigma union epsilon}$]
+  delta: Q times mark(Sigma_epsilon, tag: #<se>) -> cal(P)(Q) = { R | R subset.eq Q }
+  #annot(<se>, pos: bottom)[${Sigma union epsilon}$]
 $
 
 允许 $epsilon$ (即空字符串) 作为转移标签, 即可以在不消耗任何输入的情况下进行转移.
@@ -454,90 +451,90 @@ $
 eNFA 的 Rust 代码实现为:
 
 #figure(caption: [非确定有限自动机.])[
-```rust
-use std::marker::PhantomData;
+  ```rust
+  use std::marker::PhantomData;
 
-struct Nfa<S, A, D>
-where
-    S: Copy + PartialEq + 'static,
-    D: Fn(S, Option<&A>) -> &'static [S],
-{
-    start_state: S,
-    accept_states: Vec<S>,
-    transition: D,
-    _phantom_data: PhantomData<A>,
-}
+  struct Nfa<S, A, D>
+  where
+      S: Copy + PartialEq + 'static,
+      D: Fn(S, Option<&A>) -> &'static [S],
+  {
+      start_state: S,
+      accept_states: Vec<S>,
+      transition: D,
+      _phantom_data: PhantomData<A>,
+  }
 
-impl<S, A, D> Nfa<S, A, D>
-where
-    S: Copy + PartialEq + 'static,
-    D: Fn(S, Option<&A>) -> &'static [S],
-{
-    fn new(start_state: S, accept_states: Vec<S>, transition: D) -> Self {
-        Self {
-            start_state,
-            accept_states,
-            transition,
-            _phantom_data: PhantomData,
-        }
-    }
+  impl<S, A, D> Nfa<S, A, D>
+  where
+      S: Copy + PartialEq + 'static,
+      D: Fn(S, Option<&A>) -> &'static [S],
+  {
+      fn new(start_state: S, accept_states: Vec<S>, transition: D) -> Self {
+          Self {
+              start_state,
+              accept_states,
+              transition,
+              _phantom_data: PhantomData,
+          }
+      }
 
-    fn recognize(&self, string: &[A]) -> bool {
-        self.recognize_inner(self.start_state, string)
-    }
+      fn recognize(&self, string: &[A]) -> bool {
+          self.recognize_inner(self.start_state, string)
+      }
 
-    fn recognize_inner(&self, state: S, string: &[A]) -> bool {
-        match string {
-            [] => {
-                self.accept_states.contains(&state)
-                    || (self.transition)(state, None)
-                        .iter()
-                        .any(|state| self.accept_states.contains(state))
-            }
-            [symbol, rest @ ..] => {
-                (self.transition)(state, Some(symbol))
-                    .iter()
-                    .any(|&state| self.recognize_inner(state, rest))
-                    || (self.transition)(state, None)
-                        .iter()
-                        .any(|&state| self.recognize_inner(state, string))
-            }
-        }
-    }
-}
-```
+      fn recognize_inner(&self, state: S, string: &[A]) -> bool {
+          match string {
+              [] => {
+                  self.accept_states.contains(&state)
+                      || (self.transition)(state, None)
+                          .iter()
+                          .any(|state| self.accept_states.contains(state))
+              }
+              [symbol, rest @ ..] => {
+                  (self.transition)(state, Some(symbol))
+                      .iter()
+                      .any(|&state| self.recognize_inner(state, rest))
+                      || (self.transition)(state, None)
+                          .iter()
+                          .any(|&state| self.recognize_inner(state, string))
+              }
+          }
+      }
+  }
+  ```
 ]
 
 #figure(caption: [非确定有限自动机 $N_2$.])[
-```rust
-#[derive(Clone, Copy, PartialEq)]
-enum State {
-    Q1,
-    Q2,
-    Q3,
-    Q4,
-}
+  ```rust
+  #[derive(Clone, Copy, PartialEq)]
+  enum State {
+      Q1,
+      Q2,
+      Q3,
+      Q4,
+  }
 
-enum Alphabet {
-    A,
-    B,
-}
+  enum Alphabet {
+      A,
+      B,
+  }
 
-fn main() {
-    let n1 = Nfa::new(State::Q1, vec![State::Q4], |state, symbol| {
-        match (state, symbol) {
-            (State::Q1, Some(Alphabet::A)) => &[State::Q1, State::Q2],
-            (State::Q2, Some(Alphabet::B)) => &[State::Q1, State::Q3],
-            (State::Q3, Some(Alphabet::A) | None) => &[State::Q4],
-            _ => &[],
-        }
-    });
+  fn main() {
+      let n1 = Nfa::new(State::Q1, vec![State::Q4], |state, symbol| {
+          match (state, symbol) {
+              (State::Q1, Some(Alphabet::A)) => &[State::Q1, State::Q2],
+              (State::Q2, Some(Alphabet::B)) => &[State::Q1, State::Q3],
+              (State::Q3, Some(Alphabet::A) | None) => &[State::Q4],
+              _ => &[],
+          }
+      });
 
-    assert!(n1.recognize(&[Alphabet::A, Alphabet::B]));
-    assert!(!n1.recognize(&[Alphabet::A, Alphabet::A]));
-    assert!(!n1.recognize(&[Alphabet::A, Alphabet::B, Alphabet::B]));
-}
-```
+      assert!(n1.recognize(&[Alphabet::A, Alphabet::B]));
+      assert!(!n1.recognize(&[Alphabet::A, Alphabet::A]));
+      assert!(!n1.recognize(&[Alphabet::A, Alphabet::B, Alphabet::B]));
+  }
+  ```
 ]
 
 == NFA 转 DFA <nfa-to-dfa>
@@ -556,9 +553,8 @@ $M'$ 中的状态 $R$, 用于同时跟踪 $M$ 中的多个状态. \
 因此在进行状态转移的时候, 也需要分别转移 $R$ 中的每个状态:
 
 $
-delta'(mark(R, tag: #<r>), a) = { q | q in delta(r, a) "for some" r in R}
-
-#annot(<r>, pos: bottom, yshift: 0.5em)[$R in Q'$]
+  delta'(mark(R, tag: #<r>), a) = { q | q in delta(r, a) "for some" r in R}
+  #annot(<r>, pos: bottom, yshift: 0.5em)[$R in Q'$]
 $
 
 NFA 和 DFA 都只有一个起始状态, 但 $M'$ 中的状态是一个集合:
@@ -603,7 +599,7 @@ NFA 的不确定性使其具有*尝试*或*猜测*的能力, 因此现在可以�
 
     node(enclose: (<m1_q2>, <m1_q3>), stroke: (dash: "dashed"), snap: false),
     node(enclose: (<m2_q4>, <m2_q5>), stroke: (dash: "dashed"), snap: false),
-  )
+  ),
 )
 
 === 证明定理 2
@@ -642,7 +638,7 @@ $M_3$ 接受输入 $w$, 如果 $w = x y$, 其中 $x$ 被 $M_1$ 所识别, $y$ �
 
     node(enclose: (<m1_q1>, <m1_q2>, <m1_q3>), stroke: (dash: "dashed"), snap: false),
     node(enclose: (<m2_q4>, <m2_q5>, <m2_q6>), stroke: (dash: "dashed"), snap: false),
-  )
+  ),
 )
 
 === 证明定理 3
@@ -674,7 +670,7 @@ $M'$ 接受输入 $w$, 如果 $w = x_0 x_1 ... x_k$, 其中 $k >= 0$, 任意 $x$
     trans(<m_q4>, <m_q2>, [$epsilon$], bend: 20deg),
 
     node(enclose: (<m_q2>, <m_q3>, <m_q4>), stroke: (dash: "dashed"), snap: false),
-  )
+  ),
 )
 
 因为 $A^*$ 一定包含 $epsilon$, 所以添加新的接受状态 $q_1$, 以确保 $M'$ 能接受空字符串.
@@ -725,7 +721,7 @@ $M'$ 接受输入 $w$, 如果 $w = x_0 x_1 ... x_k$, 其中 $k >= 0$, 任意 $x$
 
     trans(<q2>, <q1>, [$b$], bend: 20deg, label-side: right),
     trans(<q2>, <q3>, [$a a b$], bend: 20deg),
-  )
+  ),
 ) <fake-gnfa>
 
 ==== 正式定义
@@ -763,7 +759,7 @@ $M'$ 接受输入 $w$, 如果 $w = x_0 x_1 ... x_k$, 其中 $k >= 0$, 任意 $x$
 
     trans(<q2>, <q4>, [$epsilon$], label-side: right),
     trans(<q3>, <q4>, [$epsilon$], label-side: right),
-  )
+  ),
 )
 
 *引理*: 任意 GNFA $G$ 都有对应的正则表达式 $R$.
@@ -775,7 +771,7 @@ $M'$ 接受输入 $w$, 如果 $w = x_0 x_1 ... x_k$, 其中 $k >= 0$, 任意 $x$
 - $G_2$ 有对应的正则表达式.
 - 当 $k > 2$ 时, $G_k$ 可以转换为等效的 $G_(k - 1)$.
 
-这样对于任何 $k > 2$ 的 $G_k$ 来说, 最终能被一个 $G_2$ 所表示.  
+这样对于任何 $k > 2$ 的 $G_k$ 来说, 最终能被一个 $G_2$ 所表示.
 又因为 $G_2$ 已被证明有对应的正则表达式, 所以任意 GNFA 都有对应的正则表达式.
 
 #figure(
@@ -792,7 +788,7 @@ $G_k$ 可以转换为等效的 $G_(k - 1)$ 意味着从 $G_k$ 中删除一个状
   caption: [$G_(k - 1)$ 到 $G_k$ 示意图. @mitocw_theory_of_computation],
 )
 
-此处删除了一个状态, 并添加了等效的正则表达式.  
+此处删除了一个状态, 并添加了等效的正则表达式.
 重复该过程, 就可以将 $G_k$ 转化为 $G_2$, 并最终获取能表达整个 GNFA 的正则表达式.
 
 == 非正则语言 (Non-regular languages)
@@ -827,7 +823,7 @@ $G_k$ 可以转换为等效的 $G_(k - 1)$ 意味着从 $G_k$ 中删除一个状
     trans(<q1>, <q2>, [$x$], "wave"),
     trans(<q2>, <q2>, [$y$], bend: 130deg, "wave"),
     trans(<q2>, <q3>, [$z$], "wave"),
-  )
+  ),
 )
 
 $s$ 必须属于该自动机的语言, 否则可能被提前拒绝 (字符串被截断).
@@ -837,16 +833,16 @@ $s$ 必须属于该自动机的语言, 否则可能被提前拒绝 (字符串被
 下面是上下文无关语法#footnote[此处翻译为大陆地区所使用的 "语法", 而非港台地区所使用的 "文法".] (以下简称 CFG) $G_1$ 的产生式 (production rules):
 
 $
-S -> 0 S 1 \
-S -> R \
-R -> epsilon
+  S -> 0 S 1 \
+  S -> R \
+  R -> epsilon
 $
 
 缩写:
 
 $
-S -> 0 S 1 space | space R \
-R -> epsilon
+  S -> 0 S 1 space | space R \
+  R -> epsilon
 $
 
 分析后可知, 其语言为:
@@ -873,7 +869,7 @@ $ L(G) = { w | w in Sigma^* "and" S limits(=>)^* w} $
 
 == 下推自动机 (Pushdown automata) <pda>
 
-下推自动机 (以下简称 PDA) 与 NFA 相比, 多了一个栈 (stack).
+下推自动机 (以下简称 PDA) 比 NFA 多了一个栈 (stack).
 - 栈顶元素可以作为转移函数的参数: 状态的转移不再仅限于当前状态和输入字符串.
 - 可以对栈进行操作: 压栈 (push) 和出栈 (pop).
 
