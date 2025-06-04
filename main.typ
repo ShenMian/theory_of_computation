@@ -1,12 +1,12 @@
-#import "@preview/ilm:1.4.0": *
-#import "@preview/mannot:0.2.1": *
+#import "@preview/ilm:1.4.1": *
+#import "@preview/mannot:0.3.0": *
 
-#import "@preview/codly:1.2.0": *
-#import "@preview/codly-languages:0.1.1": *
+#import "@preview/codly:1.3.0": *
+#import "@preview/codly-languages:0.1.8": *
 #show: codly-init
 #codly(languages: codly-languages)
 
-#import "@preview/fletcher:0.5.4" as fletcher: node
+#import "@preview/fletcher:0.5.8" as fletcher: node
 #let diagram = fletcher.diagram.with(node-stroke: .1em)
 #let trans = fletcher.edge.with(marks: "-|>")
 #let state = fletcher.node.with(shape: circle)
@@ -321,7 +321,7 @@ $ delta((q, r), a) = (delta_1(q, a), delta_2(r, a)) $
 只要 $q in Q_1$ 或 $r in Q_2$, 该状态即为 $M$ 的接受状态:
 
 $
-  F = mark((F_1 times Q_2), tag: #<f1>) union mark((Q_1 times F_2), tag: #<f2>, color: #blue)
+  F = markhl((F_1 times Q_2), tag: #<f1>) union markhl((Q_1 times F_2), tag: #<f2>, color: #blue)
   #annot(<f1>, pos: top)[$M_1$ 的接受状态与 $M_2$ 的任意状态]
   #annot(<f2>, pos: bottom)[$M_1$ 的任意状态与 $M_2$ 的接受状态]
 $
@@ -405,7 +405,7 @@ $
 NFA 的新特性*均与转移有关*, 因此它与 DFA 的五元组定义相似, 唯一的区别在于转移函数:
 
 $
-  delta: Q times Sigma -> mark(cal(P)(Q), tag: #<powerset>) = { R | R subset.eq Q }
+  delta: Q times Sigma -> markhl(cal(P)(Q), tag: #<powerset>) = { R | R subset.eq Q }
   #annot(<powerset>, pos: bottom)[$Q$ 的幂集]
 $
 
@@ -425,7 +425,7 @@ $
 eNFA 的定义与 NFA 类似, 但转移函数允许 $epsilon$-转移:
 
 $
-  delta: Q times mark(Sigma_epsilon, tag: #<se>) -> cal(P)(Q) = { R | R subset.eq Q }
+  delta: Q times markhl(Sigma_epsilon, tag: #<se>) -> cal(P)(Q) = { R | R subset.eq Q }
   #annot(<se>, pos: bottom)[${Sigma union epsilon}$]
 $
 
@@ -553,8 +553,8 @@ $M'$ 中的状态 $R$, 用于同时跟踪 $M$ 中的多个状态. \
 因此在进行状态转移的时候, 也需要分别转移 $R$ 中的每个状态:
 
 $
-  delta'(mark(R, tag: #<r>), a) = { q | q in delta(r, a) "for some" r in R}
-  #annot(<r>, pos: bottom, yshift: 0.5em)[$R in Q'$]
+  delta'(markhl(R, tag: #<r>), a) = { q | q in delta(r, a) "for some" r in R}
+  #annot(<r>, pos: bottom, dy: 0.5em)[$R in Q'$]
 $
 
 NFA 和 DFA 都只有一个起始状态, 但 $M'$ 中的状态是一个集合:
